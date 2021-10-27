@@ -1,9 +1,7 @@
 import sys
-import datetime
 sys.path.append('../')
-
+import datetime
 import enum
-
 from RowingBoat import db
 
 class User(db.Model):
@@ -17,12 +15,12 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     birth_date = db.Column(db.DateTime, nullable=False)
     is_account_valid = db.Column(db.Boolean, nullable=False, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now())
 
     # relations
     bookings = db.relationship("Booking", back_populates='user', lazy=True, cascade="all, delete")
     notifications = db.relationship("Notification", back_populates='user', lazy=True, cascade="all, delete")
-
+    favorites = db.relationship("Favorite", back_populates='user', lazy=True, cascade="all, delete")
 
 # Table Rowing Boat
 class BoatCondition(enum.IntEnum):
@@ -51,11 +49,13 @@ class Booking(db.Model):
     reserved_slots = db.Column(db.Integer, nullable=False)
     google_exported = db.Column(db.Boolean, nullable=False, default=False)
     apple_exported = db.Column(db.Boolean, nullable=False, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     boat_id = db.Column(db.Integer, db.ForeignKey('RowingBoat.boat_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.user_id'), nullable=False)
 
     # relations
     boat = db.relationship("RowingBoat", back_populates='bookings', lazy=True, foreign_keys=[boat_id])
+    user = db.relationship("User", back_populates='bookings', lazy=True, foreign_keys=[user_id])
 
 class Notification(db.Model):
     __tablename__ = "Notification"
@@ -63,7 +63,7 @@ class Notification(db.Model):
     notification_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     content = db.Column(db.Text, nullable=False, default="")
     is_read = db.Column(db.Boolean, nullable=False, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('User.user_id'), nullable=False)
 
     # relations
@@ -73,7 +73,7 @@ class Favorite(db.Model):
     __tablename__ = "Favorite"
 
     favorite_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     boat_id = db.Column(db.Integer, db.ForeignKey('RowingBoat.boat_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('User.user_id'), nullable=False)
 

@@ -14,3 +14,4 @@ else:
     print('file not found')
 
 db.create_all(app=create_app())
+print("Database created !")

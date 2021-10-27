@@ -1,12 +1,15 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+
 from RowingBoat.config import Config
 from flask_restful import Api
 
-from RowingBoat.user.route import UserRoute
+from RowingBoat.user.route import SignUpRoute
 
 
-db = SQLAlchemy()
+db      = SQLAlchemy()
+bcrypt  = Bcrypt()
 
 def create_app(config=Config):
 
@@ -17,13 +20,18 @@ def create_app(config=Config):
     from database.models import Favorite
     from database.models import Notification
 
+    print(config.SQLALCHEMY_DATABASE_URI)
+
     app = Flask(__name__)
     api = Api(app)
 
     # add the routes of the API
-    api.add_resource(UserRoute, "/")
+    api.add_resource(SignUpRoute, "/sign_up")
 
     app.config.from_object(config)
+
+    # init
     db.init_app(app)
+    bcrypt.init_app(app)
 
     return app
