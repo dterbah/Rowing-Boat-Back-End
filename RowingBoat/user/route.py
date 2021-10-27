@@ -48,6 +48,7 @@ class SignUpRoute(Resource):
         if user != None:
             # The email is already used
             error_response['message'] = f'The email "{email}" is not available.'
+            return error_response
 
         # Password
         if not 'password' in data:
