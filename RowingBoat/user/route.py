@@ -4,10 +4,12 @@ import os
 import jwt
 from functools import wraps
 
+from distutils.util import strtobool
+
 from flask_restful import Resource
 from flask import Flask, request, jsonify
 from datetime import datetime, timedelta
-from middleware.token_required import token_required
+from middleware import token_required
 
 class UserSignUpSignIn(Resource):
     # Route for Sign up
@@ -65,7 +67,8 @@ class UserSignUpSignIn(Resource):
         # Is Admin
         is_admin = False
         if 'is_admin' in data:
-            is_admin = request.form.is_admin
+            is_admin = strtobool(data['is_admin'])
+
 
         is_account_valid = False
         if is_admin:
@@ -96,6 +99,7 @@ class UserSignUpSignIn(Resource):
     def get(self):
         from database.models import User
         from RowingBoat import db
+        from RowingBoat import bcrypt
         from RowingBoat.config import Config
 
         config = Config()

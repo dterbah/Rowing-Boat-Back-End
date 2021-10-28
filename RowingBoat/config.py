@@ -1,5 +1,7 @@
 import os
 
+UPLOAD_BOAT_FOLDER = os.path.abspath(f'images')
+
 class Config:
     # secure after
     SECRET_KEY = "mykey"

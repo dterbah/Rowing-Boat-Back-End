@@ -6,6 +6,7 @@ from RowingBoat.config import Config
 from flask_restful import Api
 
 from RowingBoat.user.route import UserSignUpSignIn, UserProfile
+from RowingBoat.boat.route import BoatAddAndGet
 
 
 db      = SQLAlchemy()
@@ -26,8 +27,13 @@ def create_app(config=Config):
     api = Api(app)
 
     # add the routes of the API
+    
+    # User routes
     api.add_resource(UserSignUpSignIn, "/user")
     api.add_resource(UserProfile, "/user/profile")
+
+    # Boats routes
+    api.add_resource(BoatAddAndGet, "/boat")
 
     app.config.from_object(config)
 

@@ -41,7 +41,7 @@ class RowingBoat(db.Model):
     __tablename__ = "RowingBoat"
 
     boat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
     slots = db.Column(db.Integer, nullable=False)
     image_path = db.Column(db.String(250), nullable=False)
     boat_class = db.Column(db.String(10), nullable=False)
