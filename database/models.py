@@ -51,6 +51,16 @@ class RowingBoat(db.Model):
     bookings = db.relationship("Booking", back_populates='boat', lazy=True, cascade="all, delete")
     favorites = db.relationship("Favorite", back_populates='boat', lazy=True, cascade="all, delete")
 
+    def to_json(self):
+        return {
+            'boat_id': self.boat_id,
+            'name': self.name,
+            'slots': self.slots,
+            'boat_class': self.boat_class,
+            'brand': self.brand,
+            'built_year': self.built_year
+        }
+
 class Booking(db.Model):
     __tablename__ = "Booking"
 
