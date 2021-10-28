@@ -22,6 +22,15 @@ class User(db.Model):
     notifications = db.relationship("Notification", back_populates='user', lazy=True, cascade="all, delete")
     favorites = db.relationship("Favorite", back_populates='user', lazy=True, cascade="all, delete")
 
+    def to_json(self):
+        return {
+            'lastname': self.lastname,
+            'firstname': self.firstname,
+            'email': self.email,
+            'birth_date': self.birth_date.strftime("%d/%m/%Y"),
+            'is_account_valid': self.is_account_valid
+        }
+
 # Table Rowing Boat
 class BoatCondition(enum.IntEnum):
     NEW = 1

@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 from RowingBoat.config import Config
 from flask_restful import Api
 
-from RowingBoat.user.route import SignUpRoute
+from RowingBoat.user.route import UserSignUpSignIn, UserProfile
 
 
 db      = SQLAlchemy()
@@ -26,7 +26,8 @@ def create_app(config=Config):
     api = Api(app)
 
     # add the routes of the API
-    api.add_resource(SignUpRoute, "/sign_up")
+    api.add_resource(UserSignUpSignIn, "/user")
+    api.add_resource(UserProfile, "/user/profile")
 
     app.config.from_object(config)
 
