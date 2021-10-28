@@ -95,7 +95,6 @@ class UserSignUpSignIn(Resource):
 
     def get(self):
         from database.models import User
-        from RowingBoat import bcrypt
         from RowingBoat import db
         from RowingBoat.config import Config
 
@@ -135,7 +134,29 @@ class UserSignUpSignIn(Resource):
             'token': token
         }
 
+    @token_required
+    def patch(user, self):
+        from RowingBoat import db
+        from RowingBoat import bcrypt
 
+        data = request.form.to_dict()
+
+        email = data['email'] if 'email' in data else user.email
+        lastname = data['lastname'] if 'lastname' in data else user.lastname
+        firstname = data['firstname'] if 'firstname' in data else user.firstname
+        password = bcrypt.generate_password_hash(data['password']) if 'password' in data else user.password
+
+        user.email = email
+        user.lastname = lastname
+        user.firstname = firstname
+        user.password = password
+
+        db.session.commit()
+
+        return {
+            'success': True,
+            'message': 'Account updated successfully'
+        }
 
 class UserProfile(Resource):
     @token_required
