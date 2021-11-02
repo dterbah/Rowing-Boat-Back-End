@@ -4,6 +4,30 @@ import datetime
 import enum
 from RowingBoat import db
 
+STRING_CONSTANTS_USER = {
+    'LOW': 1,
+    'MODERATE': 2,
+    'HIGH': 3
+}
+
+REVERSE_STRING_CONSTANTS_USER = {
+    1: 'LOW',
+    2: 'MODERATE',
+    3: 'HIGH'
+}
+
+USER_GENDER = {
+    'MALE': 1,
+    'FEMALE': 2,
+    'DIVERSE': 3
+}
+
+REVERSE_USER_GENDER = {
+    1: 'MALE',
+    2: 'FEMALE',
+    3: 'DIVERSE'
+}
+
 class User(db.Model):
     __tablename__ = "User"
     
@@ -16,6 +40,10 @@ class User(db.Model):
     birth_date = db.Column(db.DateTime, nullable=False)
     is_account_valid = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
+    fitness = db.Column(db.Integer, nullable=False)
+    skill_level = db.Column(db.Integer, nullable=False)
+    ambitions = db.Column(db.Integer, nullable=False)
+    gender = db.Column(db.Integer, nullable=False)
 
     # relations
     bookings = db.relationship("Booking", back_populates='user', lazy=True, cascade="all, delete")
@@ -28,7 +56,11 @@ class User(db.Model):
             'firstname': self.firstname,
             'email': self.email,
             'birth_date': self.birth_date.strftime("%d/%m/%Y"),
-            'is_account_valid': self.is_account_valid
+            'is_account_valid': self.is_account_valid,
+            'fitness': REVERSE_STRING_CONSTANTS_USER[self.fitness],
+            'skill_level': REVERSE_STRING_CONSTANTS_USER[self.skill_level],
+            'ambitions': REVERSE_STRING_CONSTANTS_USER[self.ambitions],
+            'gender': REVERSE_USER_GENDER[self.gender]
         }
 
 # Table Rowing Boat

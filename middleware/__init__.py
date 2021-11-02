@@ -1,6 +1,7 @@
 from flask import request, jsonify
 import jwt
 from functools import wraps
+from datetime import datetime
 
 def check_admin_user(f):
     @wraps(f)
@@ -13,6 +14,8 @@ def check_admin_user(f):
         try:
             data = jwt.decode(token, config.SECRET_KEY, algorithms=["HS256"])            
             current_user = User.query.filter_by(user_id=data['user_id']).first()
+            if not current_user.is_admin:
+                return jsonify({'message': 'Unauthorized access'})
         except:
             return jsonify({'message': 'token is invalid'})
 
@@ -29,7 +32,7 @@ def token_required(f):
         token = None
         if 'x-access-tokens' in request.headers:
             token = request.headers['x-access-tokens']
-    
+
         if not token:
             return jsonify({'message': 'a valid token is missing'})
         try:

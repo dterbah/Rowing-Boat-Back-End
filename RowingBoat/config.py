@@ -1,6 +1,6 @@
 import os
 
-UPLOAD_BOAT_FOLDER = os.path.abspath(f'images')
+UPLOAD_BOAT_FOLDER = os.path.abspath(f'images/boat')
 
 class Config:
     # secure after

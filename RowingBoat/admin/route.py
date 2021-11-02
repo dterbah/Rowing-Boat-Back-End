@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 from utils import allowed_file
 from flask import send_file
 
-class BoatGet(Resource):
+class AdminCreateBoat(Resource):
     @token_required
     @check_admin_user
     def post(self, user):
@@ -109,36 +109,33 @@ class BoatGet(Resource):
             error_response['message'] = 'The allowed extensions are : png, svg, jpg and jpeg'
             return error_response
 
-        
-    def get(self):
+
+
+class AdminDeleteBoat(Resource):
+
+    @token_required
+    @check_admin_user
+    def delete(current_user, self, boat_id):
         from database.models import RowingBoat
+        from RowingBoat.config import UPLOAD_BOAT_FOLDER
+        from RowingBoat import db
 
-        boats_json = []
-
-        boats = RowingBoat.query.all()
-        for boat in boats:
-            boats_json.append(boat.to_json())
-
-        return {
-            'success': True,
-            'boats': boats_json
-        }
-
-
-class BoatImageGet(Resource):
-    def get(self, boat_id):
-        from database.models import RowingBoat
         error_response = {
             'success': False
         }
-        
-        # Retrieve the boat
-        boat = RowingBoat.query.filter_by(boat_id=boat_id).first()
 
+        boat = RowingBoat.query.filter_by(boat_id=boat_id).first()
         if boat == None:
-            error_response['message'] = 'The boat id is invalid'
+            error_response['message'] = f'The boat with the id {boat_id} is not existing.'
             return error_response
 
-        # Send the image
-        image_path = boat.image_path
-        return send_file(image_path, mimetype='image/gif')
+        # Remove the image associated to the boat
+        os.remove(boat.image_path)
+
+        db.session.delete(boat)
+        db.session.commit()
+
+        return {
+            'success': True,
+            'message': f'The boat {boat.name} is correctly deleted'
+        }

@@ -14,7 +14,7 @@ from middleware import token_required
 class UserSignUpSignIn(Resource):
     # Route for Sign up
     def post(self):
-        from database.models import User
+        from database.models import User, STRING_CONSTANTS_USER, USER_GENDER
         from RowingBoat import bcrypt
         from RowingBoat import db
 
@@ -82,13 +82,57 @@ class UserSignUpSignIn(Resource):
         birth_date = data['birth_date']
         formatted_birth_date = datetime.strptime(birth_date, "%d/%m/%Y")
 
+        # Ambitions 
+        if not 'ambitions' in data:
+            error_response['message'] = 'The ambitions are missing'
+            return error_response
+
+        ambitions = data['ambitions'].upper()
+        if not ambitions in STRING_CONSTANTS_USER:
+            error_response['message'] = f'The value "{ambitions}" for ambitions is not correct'
+            return error_response
+
+        # Fitness
+        if not 'fitness' in data:
+            error_response['message'] = 'The fitness is missing'
+            return error_response
+
+        fitness = data['fitness'].upper()
+        if not fitness in STRING_CONSTANTS_USER:
+            error_response['message'] = f'The value "{fitness}" for fitness is not correct'
+            return error_response
+
+        # Skill level
+        if not 'skill_level' in data:
+            error_response['message'] = 'The skill level is missing'
+            return error_response
+
+        skill_level = data['skill_level'].upper()
+        if not ambitions in STRING_CONSTANTS_USER:
+            error_response['message'] = f'The value "{skill_level}" for the skill level is not correct'
+            return error_response
+
+        # Gender
+        if not 'gender' in data:
+            error_response['message'] = 'The gender is missing'
+            return error_response
+
+        gender = data['gender'].upper()
+        if not gender in USER_GENDER:
+            error_response['message'] = f'The value "{gender}" for the gender is not correct'
+            return error_response
+
         user = User(lastname=lastname,
                     firstname=firstname,
                     password=encrypted_password,
                     email=email,
                     birth_date=formatted_birth_date,
                     is_admin=is_admin,
-                    is_account_valid=is_account_valid
+                    is_account_valid=is_account_valid,
+                    gender=USER_GENDER[gender],
+                    fitness=STRING_CONSTANTS_USER[fitness],
+                    skill_level=STRING_CONSTANTS_USER[skill_level],
+                    ambitions=STRING_CONSTANTS_USER[ambitions]
         )
 
         db.session.add(user)

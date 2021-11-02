@@ -6,7 +6,9 @@ from RowingBoat.config import Config
 from flask_restful import Api
 
 from RowingBoat.user.route import UserSignUpSignIn, UserProfile
-from RowingBoat.boat.route import BoatAddAndGet, BoatImageGet
+from RowingBoat.boat.route import BoatGet, BoatImageGet
+from RowingBoat.admin.route import AdminCreateBoat
+from RowingBoat.admin.route import AdminDeleteBoat
 
 
 db      = SQLAlchemy()
@@ -33,8 +35,13 @@ def create_app(config=Config):
     api.add_resource(UserProfile, "/user/profile")
 
     # Boats routes
-    api.add_resource(BoatAddAndGet, "/boat")
+    api.add_resource(BoatGet, "/boat")
     api.add_resource(BoatImageGet, "/boat/<int:boat_id>/image")
+
+    # Admin routes
+    api.add_resource(AdminCreateBoat, "/admin/create_boat")
+    api.add_resource(AdminDeleteBoat, "/admin/<int:boat_id>/delete_boat")
+
 
     app.config.from_object(config)
 
