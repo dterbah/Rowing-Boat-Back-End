@@ -112,7 +112,6 @@ class AdminCreateBoat(Resource):
 
 
 class AdminDeleteBoat(Resource):
-
     @token_required
     @check_admin_user
     def delete(current_user, self, boat_id):
@@ -138,4 +137,59 @@ class AdminDeleteBoat(Resource):
         return {
             'success': True,
             'message': f'The boat {boat.name} is correctly deleted'
+        }
+
+
+class AdminGetAccountToValidate(Resource):
+    @token_required
+    @check_admin_user
+    def get(current_user, self):
+        from database.models import User
+        result = []
+        users = User.query.filter_by(is_account_valid=False)
+
+        for user in users:
+            result.append(user.to_json())
+
+        return {
+            'success': True,
+            'users': result
+        }
+
+VALID_ACCOUNT_NOTIFICATION_ACCOUNT = "Your account is valid, you can now book boats."
+
+class AdminValidateAccount(Resource):
+    @token_required
+    @check_admin_user
+    def post(current_user, self, user_id):
+        from database.models import User, Notification
+        from RowingBoat import db
+        error_response = {
+            'success': False
+        }
+        
+        # Try to get the user by his id
+        user = User.query.filter_by(user_id=user_id).first()
+        if user == None:
+            error_response['message'] = f'The user with the id {user_id} does not exist'
+            return error_response
+
+        if user.is_account_valid:
+            error_response['message'] = 'This account is already validated'
+            return error_response
+
+        # Update the user and create a notification
+        user.is_account_valid = True
+
+        notification = Notification(
+            content=VALID_ACCOUNT_NOTIFICATION_ACCOUNT,
+            user_id=user_id
+        )
+
+        db.session.add(notification)
+        db.session.commit()
+
+        return {
+            'success': True,
+            'message': 'Account validated successfully'
         }

@@ -51,6 +51,12 @@ class User(db.Model):
     favorites = db.relationship("Favorite", back_populates='user', lazy=True, cascade="all, delete")
 
     def to_json(self):
+        notifications_json = []
+        for notification in self.notifications:
+            if not notification.is_read:
+                notifications_json.append(notification.to_json())
+
+
         return {
             'lastname': self.lastname,
             'firstname': self.firstname,
@@ -60,7 +66,8 @@ class User(db.Model):
             'fitness': REVERSE_STRING_CONSTANTS_USER[self.fitness],
             'skill_level': REVERSE_STRING_CONSTANTS_USER[self.skill_level],
             'ambitions': REVERSE_STRING_CONSTANTS_USER[self.ambitions],
-            'gender': REVERSE_USER_GENDER[self.gender]
+            'gender': REVERSE_USER_GENDER[self.gender],
+            'notifications': notifications_json
         }
 
 # Table Rowing Boat
@@ -113,12 +120,19 @@ class Notification(db.Model):
 
     notification_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     content = db.Column(db.Text, nullable=False, default="")
-    is_read = db.Column(db.Boolean, nullable=False, default=True)
+    is_read = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('User.user_id'), nullable=False)
 
     # relations
     user = db.relationship('User', back_populates='notifications', foreign_keys=[user_id])
+
+    def to_json(self):
+        return {
+            'notification_id': self.notification_id,
+            'content': self.content,
+            'created_at': self.created_at.strftime("%d/%m/%Y")
+        }
 
 class Favorite(db.Model):
     __tablename__ = "Favorite"
