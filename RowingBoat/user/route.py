@@ -11,8 +11,11 @@ from flask import Flask, request, jsonify
 from datetime import datetime, timedelta
 from middleware import token_required
 
+from flask_cors import cross_origin
+
 class UserSignUpSignIn(Resource):
     # Route for Sign up
+    @cross_origin()
     def post(self):
         from database.models import User, STRING_CONSTANTS_USER, USER_GENDER
         from RowingBoat import bcrypt
@@ -74,13 +77,19 @@ class UserSignUpSignIn(Resource):
         if is_admin:
             is_account_valid = True
 
-        # Birth data
-        if not 'birth_date' in data:
-            error_response['message'] = 'The birth date is missing'
+        # Age data
+        if not 'age' in data:
+            error_response['message'] = 'The age is missing'
             return error_response
 
-        birth_date = data['birth_date']
-        formatted_birth_date = datetime.strptime(birth_date, "%d/%m/%Y")
+        age = data['age']
+
+        # Phone number
+        if not 'phoneNumber' in data:
+            error_response['message'] = 'The phone number is missing'
+            return error_response
+
+        phoneNumber = data['phoneNumber']
 
         # Ambitions 
         if not 'ambitions' in data:
@@ -126,7 +135,8 @@ class UserSignUpSignIn(Resource):
                     firstname=firstname,
                     password=encrypted_password,
                     email=email,
-                    birth_date=formatted_birth_date,
+                    age=age,
+                    phoneNumber=phoneNumber,
                     is_admin=is_admin,
                     is_account_valid=is_account_valid,
                     gender=USER_GENDER[gender],

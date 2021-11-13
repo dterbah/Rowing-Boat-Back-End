@@ -1,0 +1,4 @@
+sqlalchemy
+flask bcrypt
+pip install flask-restful
+pip install Flask-JWT

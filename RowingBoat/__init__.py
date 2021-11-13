@@ -22,12 +22,13 @@ def create_app(config=Config):
     from database.models import Booking
     from database.models import Favorite
     from database.models import Notification
-
-    print(config.SQLALCHEMY_DATABASE_URI)
+    from flask_cors import CORS, cross_origin
 
     app = Flask(__name__)
     api = Api(app)
-
+    cors = CORS(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
+    
     # add the routes of the API
     
     # User routes

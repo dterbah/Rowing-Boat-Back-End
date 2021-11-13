@@ -37,7 +37,9 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(512), nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
-    birth_date = db.Column(db.DateTime, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    phoneNumber = db.Column(db.String(40), nullable=False)
+
     is_account_valid = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     fitness = db.Column(db.Integer, nullable=False)
@@ -67,7 +69,8 @@ class User(db.Model):
             'skill_level': REVERSE_STRING_CONSTANTS_USER[self.skill_level],
             'ambitions': REVERSE_STRING_CONSTANTS_USER[self.ambitions],
             'gender': REVERSE_USER_GENDER[self.gender],
-            'notifications': notifications_json
+            'notifications': notifications_json,
+            'user_id': self.user_id
         }
 
 # Table Rowing Boat
