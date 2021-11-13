@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 from RowingBoat.config import Config
 from flask_restful import Api
 
-from RowingBoat.user.route import UserSignUpSignIn, UserProfile
+from RowingBoat.user.route import UserRegister, UserProfile, UserLogin
 from RowingBoat.boat.route import BoatGet, BoatImageGet
 from RowingBoat.admin.route import AdminCreateBoat
 from RowingBoat.admin.route import AdminDeleteBoat, AdminGetAccountToValidate, AdminValidateAccount
@@ -32,7 +32,9 @@ def create_app(config=Config):
     # add the routes of the API
     
     # User routes
-    api.add_resource(UserSignUpSignIn, "/user")
+    api.add_resource(UserRegister, "/register")
+    api.add_resource(UserLogin, "/login")
+
     api.add_resource(UserProfile, "/user/profile")
 
     # Boats routes

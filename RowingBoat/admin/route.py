@@ -13,6 +13,8 @@ from werkzeug.utils import secure_filename
 from utils import allowed_file
 from flask import send_file
 
+from flask_cors import cross_origin
+
 class AdminCreateBoat(Resource):
     @token_required
     @check_admin_user
@@ -143,6 +145,7 @@ class AdminDeleteBoat(Resource):
 class AdminGetAccountToValidate(Resource):
     @token_required
     @check_admin_user
+    @cross_origin()
     def get(current_user, self):
         from database.models import User
         result = []

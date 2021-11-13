@@ -13,7 +13,7 @@ from middleware import token_required
 
 from flask_cors import cross_origin
 
-class UserSignUpSignIn(Resource):
+class UserRegister(Resource):
     # Route for Sign up
     @cross_origin()
     def post(self):
@@ -150,48 +150,6 @@ class UserSignUpSignIn(Resource):
 
         return success_response
 
-    def get(self):
-        from database.models import User
-        from RowingBoat import db
-        from RowingBoat import bcrypt
-        from RowingBoat.config import Config
-
-        config = Config()
-        user = None
-        error_response = {
-            'success': False
-        }
-
-        data = request.form.to_dict()
-
-        if not 'email' in data:
-            error_response['message'] = 'The email is missing'
-            return error_response
-
-        email = data['email']
-
-        if not 'password' in data:
-            error_response['message'] = 'The password is missing'
-            return error_response
-
-        password = data['password']
-
-        user = User.query.filter_by(email=email).first()
-        if user == None:
-            error_response['message'] = f'The email {email} does not exist'
-            return error_response
-
-        # check the password
-        if (not bcrypt.check_password_hash(user.password, password)):
-            error_response['message'] = 'The password is not correct'
-            return error_response
-
-        # Create the token
-        token = jwt.encode({'user_id' : user.user_id, 'exp' : datetime.utcnow() + timedelta(minutes=300)}, config.SECRET_KEY, "HS256")
-        return {
-            'token': token
-        }
-
     @token_required
     def patch(user, self):
         from RowingBoat import db
@@ -222,4 +180,52 @@ class UserProfile(Resource):
         return {
             'success': True,
             'data': user.to_json()
+        }
+
+class UserLogin(Resource):
+    
+    def post(self):
+        from database.models import User
+        from RowingBoat import db
+        from RowingBoat import bcrypt
+        from RowingBoat.config import Config
+
+        config = Config()
+        user = None
+        error_response = {
+            'success': False
+        }
+
+        data = request.form.to_dict()
+
+        print(request.args)
+
+        if not 'email' in data:
+            error_response['message'] = 'The email is missing'
+            return error_response
+
+        email = data['email']
+
+        if not 'password' in data:
+            error_response['message'] = 'The password is missing'
+            return error_response
+
+        password = data['password']
+
+        user = User.query.filter_by(email=email).first()
+        if user == None:
+            error_response['message'] = f'The email {email} does not exist'
+            return error_response
+
+        # check the password
+        if (not bcrypt.check_password_hash(user.password, password)):
+            error_response['message'] = 'The password is not correct'
+            return error_response
+
+        # Create the token
+        token = jwt.encode({'user_id' : user.user_id, 'exp' : datetime.utcnow() + timedelta(minutes=300)}, config.SECRET_KEY, "HS256")
+        return {
+            'token': token,
+            'is_admin': user.is_admin,
+            'success': True
         }

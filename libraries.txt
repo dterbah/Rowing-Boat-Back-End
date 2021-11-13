@@ -2,3 +2,4 @@ sqlalchemy
 flask bcrypt
 pip install flask-restful
 pip install Flask-JWT
+pip3 install flask-cors
