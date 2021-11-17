@@ -196,3 +196,32 @@ class AdminValidateAccount(Resource):
             'success': True,
             'message': 'Account validated successfully'
         }
+
+class AdminDeclineAccount(Resource):
+    @token_required
+    @check_admin_user
+    def post(current_ser, self, user_id):
+        from database.models import User, Notification
+        from RowingBoat import db
+        error_response = {
+            'success': False
+        }
+
+         # Try to get the user by his id
+        user = User.query.filter_by(user_id=user_id).first()
+        if user == None:
+            error_response['message'] = f'The user with the id {user_id} does not exist'
+            return error_response
+
+        notification = Notification(
+            content="Your account had not been validated by an admin. Please contact them for more information.",
+            user_id=user_id
+        )
+
+        db.session.add(notification)
+        db.session.commit()
+
+        return {
+            'success': True,
+            'message': 'Request declined'
+        }
