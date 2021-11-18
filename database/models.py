@@ -75,10 +75,16 @@ class User(db.Model):
         }
 
 # Table Rowing Boat
-class BoatCondition(enum.IntEnum):
-    NEW = 1
-    USED = 2
-    BAD = 3
+BOATS_CONDITION = [
+    'BAD',
+    'NEW',
+    'USED'
+]
+
+BOAT_TYPE = [
+    'RACING',
+    'GIG'
+]
 
 class RowingBoat(db.Model):
     __tablename__ = "RowingBoat"
@@ -90,6 +96,9 @@ class RowingBoat(db.Model):
     boat_class = db.Column(db.String(10), nullable=False)
     brand = db.Column(db.String(40), nullable=False)
     built_year = db.Column(db.Integer, nullable=False)
+    condition = db.Column(db.String(10), nullable=False)
+    boat_type = db.Column(db.String(10), nullable=False)
+
 
     bookings = db.relationship("Booking", back_populates='boat', lazy=True, cascade="all, delete")
     favorites = db.relationship("Favorite", back_populates='boat', lazy=True, cascade="all, delete")
@@ -101,7 +110,9 @@ class RowingBoat(db.Model):
             'slots': self.slots,
             'boat_class': self.boat_class,
             'brand': self.brand,
-            'built_year': self.built_year
+            'built_year': self.built_year,
+            'boat_type': self.boat_type,
+            'condition': self.condition
         }
 
 class Booking(db.Model):

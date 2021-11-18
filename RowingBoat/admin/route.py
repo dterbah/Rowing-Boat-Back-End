@@ -19,7 +19,7 @@ class AdminCreateBoat(Resource):
     @token_required
     @check_admin_user
     def post(self, user):
-        from database.models import RowingBoat
+        from database.models import RowingBoat, BOATS_CONDITION, BOAT_TYPE
         from RowingBoat.config import UPLOAD_BOAT_FOLDER
         from RowingBoat import db
 
@@ -54,6 +54,26 @@ class AdminCreateBoat(Resource):
             return error_response
 
         boat_class = data['boat_class']
+
+        # boat condition
+        if not 'condition' in data:
+            error_response['message'] = "The condition is missing"
+            return error_response
+        
+        condition = data['condition']
+        if not condition in BOATS_CONDITION:
+            error_response['message'] = f"The condition {condition} is a bad value"
+            return error_response
+
+        # boat type
+        if not 'boat_type' in data:
+            error_response['message'] = "The boat type is missing"
+            return error_response
+
+        boat_type = data['boat_type']
+        if not boat_type in BOAT_TYPE:
+            error_response['message'] = f"The boat type {boat_type} is a bad value"
+            return error_response
 
         # Brand
         if not 'brand' in data:
@@ -94,7 +114,9 @@ class AdminCreateBoat(Resource):
                               image_path=image_path,
                               boat_class=boat_class,
                               brand=brand,
-                              built_year=built_year
+                              built_year=built_year,
+                              boat_type=boat_type,
+                              condition=condition
             )
 
             try:
