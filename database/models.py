@@ -208,7 +208,9 @@ class Booking(db.Model):
     def to_json(self):
         return {
             'booking_id': self.booking_id,
-            'date': str(self.date)
+            'date': str(self.date),
+            'type': self.boat.boat_type,
+            'class': self.boat.boat_class
         }
 
 class Notification(db.Model):
