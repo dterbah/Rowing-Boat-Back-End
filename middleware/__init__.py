@@ -43,3 +43,22 @@ def token_required(f):
     
         return f(current_user, *args, **kwargs)
     return decorator
+
+def check_account_valid(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        from database.models import User
+        from RowingBoat.config import Config
+
+        config = Config()
+        token = request.headers['x-access-tokens']
+        try:
+            data = jwt.decode(token, config.SECRET_KEY, algorithms=["HS256"])            
+            current_user = User.query.filter_by(user_id=data['user_id']).first()
+            if not current_user.is_account_valid:
+                return jsonify({'message': 'Your account is not yet validated. Please ask to an admin to validate your account before trying to book a boat.', 'success': 'false'})
+        except:
+            pass
+
+        return f(*args, **kwargs)
+    return decorator

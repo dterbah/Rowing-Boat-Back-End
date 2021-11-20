@@ -99,7 +99,6 @@ class RowingBoat(db.Model):
     condition = db.Column(db.String(10), nullable=False)
     boat_type = db.Column(db.String(10), nullable=False)
 
-
     bookings = db.relationship("Booking", back_populates='boat', lazy=True, cascade="all, delete")
     favorites = db.relationship("Favorite", back_populates='boat', lazy=True, cascade="all, delete")
 
@@ -115,20 +114,79 @@ class RowingBoat(db.Model):
             'condition': self.condition
         }
 
+
+    def is_corresponding_to_gender(self, date, gender):
+        gender_id = USER_GENDER[gender]
+        for booking in self.bookings:
+            if booking.date == date:
+                user = booking.user
+                if user.gender != gender_id:
+                    return False
+
+        return True
+
+    def is_corresponding_to_fitness_level(self, date, fitness):
+        fitness_id = STRING_CONSTANTS_USER[fitness]
+        for booking in self.bookings:
+            if booking.date == date:
+                user = booking.user
+                if user.fitness != fitness_id:
+                    return False
+
+        return True
+
+    def is_corresponding_to_skill_level(self, date, skill):
+        skill_id = STRING_CONSTANTS_USER[fitness]
+        for booking in self.bookings:
+            if booking.date == date:
+                user = booking.user
+                if user.skill_level != skill_id:
+                    return False
+
+        return True
+
+    def is_corresponding_to_age(self, date, age_from, age_to):
+        for booking in self.bookings:
+            if booking.date == date:
+                user = booking.user
+                print(f'user age {user.age}')
+                if not (user.age >= age_from and user.age <= age_to):
+                    return False
+
+        return True
+
+    def get_slots_by_date(self, begin_date):
+        import datetime
+        available_slots = self.slots
+        available_interval = [begin_date - datetime.timedelta(hours=2), begin_date + datetime.timedelta(hours=2)]
+
+        for booking in self.bookings:
+            date = booking.date
+            if (date > available_interval[0] and date < available_interval[1]):
+                available_slots -= 1
+
+        return available_slots
+
 class Booking(db.Model):
     __tablename__ = "Booking"
 
     booking_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    reserved_slots = db.Column(db.Integer, nullable=False)
     google_exported = db.Column(db.Boolean, nullable=False, default=False)
     apple_exported = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     boat_id = db.Column(db.Integer, db.ForeignKey('RowingBoat.boat_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('User.user_id'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
 
     # relations
     boat = db.relationship("RowingBoat", back_populates='bookings', lazy=True, foreign_keys=[boat_id])
     user = db.relationship("User", back_populates='bookings', lazy=True, foreign_keys=[user_id])
+
+    def to_json(self):
+        return {
+            'booking_id': self.booking_id,
+            'date': str(self.date)
+        }
 
 class Notification(db.Model):
     __tablename__ = "Notification"
@@ -147,7 +205,7 @@ class Notification(db.Model):
             'notification_id': self.notification_id,
             'content': self.content,
             'created_at': self.created_at.strftime("%d/%m/%Y")
-        }
+        }        
 
 class Favorite(db.Model):
     __tablename__ = "Favorite"

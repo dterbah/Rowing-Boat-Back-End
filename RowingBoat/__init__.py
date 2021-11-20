@@ -6,7 +6,7 @@ from RowingBoat.config import Config
 from flask_restful import Api
 
 from RowingBoat.user.route import UserRegister, UserProfile, UserLogin
-from RowingBoat.boat.route import BoatGet, BoatImageGet
+from RowingBoat.boat.route import BoatGet, BoatImageGet, BoatSearch, BoatBook
 from RowingBoat.admin.route import AdminCreateBoat
 from RowingBoat.admin.route import AdminDeleteBoat, AdminGetAccountToValidate, AdminValidateAccount, AdminDeclineAccount
 
@@ -40,6 +40,9 @@ def create_app(config=Config):
     # Boats routes
     api.add_resource(BoatGet, "/boat")
     api.add_resource(BoatImageGet, "/boat/<int:boat_id>/image")
+    api.add_resource(BoatSearch, "/boat/search")
+    api.add_resource(BoatBook, '/boat/<int:boat_id>/book')
+
 
     # Admin routes
     api.add_resource(AdminCreateBoat, "/admin/create_boat")
