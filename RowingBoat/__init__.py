@@ -10,6 +10,8 @@ from RowingBoat.boat.route import BoatGet, BoatImageGet, BoatSearch, BoatBook
 from RowingBoat.admin.route import AdminCreateBoat
 from RowingBoat.admin.route import AdminDeleteBoat, AdminGetAccountToValidate, AdminValidateAccount, AdminDeclineAccount
 
+from RowingBoat.booking.route import BookingGet
+
 
 db      = SQLAlchemy()
 bcrypt  = Bcrypt()
@@ -50,6 +52,9 @@ def create_app(config=Config):
     api.add_resource(AdminGetAccountToValidate, '/admin/user_requests')
     api.add_resource(AdminValidateAccount, '/admin/<int:user_id>/validate_account')
     api.add_resource(AdminDeclineAccount, '/admin/<int:user_id>/decline_account')
+
+    # Booking
+    api.add_resource(BookingGet, "/user/bookings")
 
 
     app.config.from_object(config)
