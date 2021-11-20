@@ -136,7 +136,7 @@ class RowingBoat(db.Model):
         return True
 
     def is_corresponding_to_skill_level(self, date, skill):
-        skill_id = STRING_CONSTANTS_USER[fitness]
+        skill_id = STRING_CONSTANTS_USER[skill]
         for booking in self.bookings:
             if booking.date == date:
                 user = booking.user
@@ -149,7 +149,6 @@ class RowingBoat(db.Model):
         for booking in self.bookings:
             if booking.date == date:
                 user = booking.user
-                print(f'user age {user.age}')
                 if not (user.age >= age_from and user.age <= age_to):
                     return False
 
@@ -166,6 +165,30 @@ class RowingBoat(db.Model):
                 available_slots -= 1
 
         return available_slots
+
+    def get_user_by_booking_date(self, begin_date):
+        import datetime
+        available_interval = [begin_date - datetime.timedelta(hours=2), begin_date + datetime.timedelta(hours=2)]
+        team = []
+
+        for booking in self.bookings:
+            date = booking.date
+            if (date > available_interval[0] and date < available_interval[1]):
+                team.append(booking.user)
+
+        return team
+
+    def has_user_for_date(self, begin_date, user_id):
+        import datetime
+        available_interval = [begin_date - datetime.timedelta(hours=2), begin_date + datetime.timedelta(hours=2)]
+
+        for booking in self.bookings:
+            date = booking.date
+            if (date > available_interval[0] and date < available_interval[1]):
+                if booking.user.user_id == user_id:
+                    return True
+
+        return False
 
 class Booking(db.Model):
     __tablename__ = "Booking"

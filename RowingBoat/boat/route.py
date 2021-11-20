@@ -109,9 +109,19 @@ class BoatSearch(Resource):
                     age_group = args['ageGroup'].split("-")
                     add_boat = add_boat and boat.is_corresponding_to_age(begin_date, int(age_group[0]), int(age_group[1]))
 
+                if 'fitness' in args and args['fitness'] != '':
+                    add_boat = add_boat and boat.is_corresponding_to_fitness_level(begin_date, args['fitness'])
+
+                if 'skill' in args and args['skill'] != '':
+                    add_boat = add_boat and boat.is_corresponding_to_skill_level(begin_date, args['skill'])
+
             if add_boat:
                 json = boat.to_json()
                 json['available_slots'] = available_slots
+                team_json = []
+                for user in boat.get_user_by_booking_date(begin_date):
+                    team_json.append(user.to_json())
+                json['team'] = team_json
                 json_boats.append(json)
 
         return {
@@ -149,6 +159,12 @@ class BoatBook(Resource):
         if boat.get_slots_by_date(begin_date) == 0:
             return {
                 'message': 'The boat you want to reserve is not available',
+                'success': False
+            }
+
+        if boat.has_user_for_date(begin_date, user.user_id):
+            return {
+                'message': f'You have already booking during the date {begin_date}',
                 'success': False
             }
 
