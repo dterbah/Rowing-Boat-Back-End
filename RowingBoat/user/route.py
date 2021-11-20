@@ -198,8 +198,6 @@ class UserLogin(Resource):
 
         data = request.form.to_dict()
 
-        print(request.args)
-
         if not 'email' in data:
             error_response['message'] = 'The email is missing'
             return error_response

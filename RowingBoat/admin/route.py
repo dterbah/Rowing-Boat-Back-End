@@ -30,7 +30,7 @@ class AdminCreateBoat(Resource):
         data = request.form.to_dict()
         
         # Name of the boat
-        if not 'name' in data:
+        if not 'name' in data or data['name'].strip() == '':
             error_response['message'] = "The boat's name is missing"
             return error_response
 
@@ -42,21 +42,24 @@ class AdminCreateBoat(Resource):
             return error_response
 
         # Slots of the boats
-        if not 'slots' in data:
+        if not 'slots' in data or data['slots'].strip() == '':
             error_response['message'] = "The boat's slots are missing"
             return error_response
 
-        slots = data['slots']
+        slots = int(data['slots'])
+        if slots < 1:
+            error_response['message'] = f"The value {slots} for the slots is incorrect"
+            return error_response
 
         # Boat class
-        if not 'boat_class' in data:
+        if not 'boat_class' in data or data['boat_class'].strip() == '':
             error_response['message'] = "The boat's class is missing"
             return error_response
 
         boat_class = data['boat_class']
 
         # boat condition
-        if not 'condition' in data:
+        if not 'condition' in data or data['boat_class'].strip() == '':
             error_response['message'] = "The condition is missing"
             return error_response
         
@@ -66,7 +69,7 @@ class AdminCreateBoat(Resource):
             return error_response
 
         # boat type
-        if not 'boat_type' in data:
+        if not 'boat_type' in data or data['boat_type'].strip() == '':
             error_response['message'] = "The boat type is missing"
             return error_response
 
@@ -83,7 +86,7 @@ class AdminCreateBoat(Resource):
         brand = data['brand']
 
         # Built year
-        if not 'built_year' in data:
+        if not 'built_year' in data or data['built_year'].strip() == '':
             error_response['message'] = "The built year is missing"
             return error_response
         
