@@ -222,6 +222,7 @@ class UserLogin(Resource):
 
         # Create the token
         token = jwt.encode({'user_id' : user.user_id, 'exp' : datetime.utcnow() + timedelta(minutes=300)}, config.SECRET_KEY, "HS256")
+        
         return {
             'token': token,
             'is_admin': user.is_admin,

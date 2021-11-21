@@ -90,7 +90,17 @@ class AdminCreateBoat(Resource):
             error_response['message'] = "The built year is missing"
             return error_response
         
-        built_year = data['built_year']
+        built_year = int(data['built_year'])
+
+        if built_year < 0:
+            error_response['message'] = f"The value {built_year} for the year is incorrect"
+            return error_response
+
+        # Check if the year is correct
+        current_year = int(datetime.now().date().strftime("%Y"))
+        if built_year > current_year:
+            error_response['message'] = f"The year should be inferior or equal to {current_year}"
+            return error_response
 
         # Image of the boat
         image_data = request.files.to_dict()
@@ -137,6 +147,76 @@ class AdminCreateBoat(Resource):
             return error_response
 
 
+
+class AdminUpdateBoat(Resource):
+    @token_required
+    @check_admin_user
+    def patch(current_user, self, boat_id):
+        from database.models import RowingBoat
+        from RowingBoat import db
+        from database.models import RowingBoat, BOATS_CONDITION, BOAT_TYPE
+        from RowingBoat.config import UPLOAD_BOAT_FOLDER
+
+        boat = RowingBoat.query.filter_by(boat_id=boat_id).first()
+        if boat == None:
+            return {
+                'success': False,
+                'message': 'The boat you are trying to update does not exist'
+            }
+
+        # Params
+        data = request.form.to_dict()
+        name = data['name'] if 'name' in data else boat.name
+
+        # Check if the name is already used
+        boat_matching_name = RowingBoat.query.filter_by(name=name).first()
+        if boat_matching_name != None and name != boat.name:
+            return {
+                'success': False,
+                'message': f'The name {name} is already used'
+            }
+
+        condition = data['condition'] if 'condition' in data else boat.condition
+        if not condition in BOATS_CONDITION:
+            return {
+                'success': False,
+                'message': f'The condition {condition} is not correct'
+            }
+        
+        brand = data['brand'] if 'brand' in data else boat.brand
+        built_year = data['built_year'] if 'built_year' in data else boat.built_year
+        image_path = boat.image_path
+
+        image_data = request.files.to_dict()
+        file = request.files.get('image')
+
+        if 'image' in image_data:
+            image_path = ''
+            if file and allowed_file(file.filename):
+                # delete the old image
+                old_path = boat.image_path
+                os.remove(old_path)
+
+                # create the new image
+                filename = secure_filename(file.filename)
+                extension = filename.rsplit('.', 1)[1].lower()
+                filename = f'{name}.{extension}'
+                print(filename)
+                image_path = os.path.join(UPLOAD_BOAT_FOLDER, filename)
+                file.save(image_path)
+
+        boat.name = name
+        boat.built_year = built_year
+        boat.image_path = image_path
+        boat.brand = brand
+        boat.condition = condition
+
+        db.session.commit()
+
+        return {
+            'message': 'The boat is successfully updated',
+            'success': True
+        }
 
 class AdminDeleteBoat(Resource):
     @token_required

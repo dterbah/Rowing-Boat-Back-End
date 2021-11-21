@@ -54,7 +54,22 @@ class BoatImageGet(Resource):
             'success': True,
             'encoded_image': image
         }
-            
+
+class BoatGetById(Resource):
+    def get(self, boat_id):
+        from database.models import RowingBoat
+
+        boat = RowingBoat.query.filter_by(boat_id=boat_id).first()
+        if boat == None:
+            return {
+                'sucess': False,
+                'message': "You are trying to access to a not existing boat."
+            }
+
+        return {
+            'success': True,
+            'boat': boat.to_json()
+        }
 
 class BoatSearch(Resource):
     @cross_origin()
