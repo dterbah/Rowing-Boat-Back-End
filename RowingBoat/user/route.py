@@ -244,6 +244,9 @@ class BookingDelete(Resource):
             error_response['message'] = f'No booking exists with booking ID : {booking_id}'
             return error_response
 
+        for booking in boat.bookings:
+            db.session.delete(booking)
+
         db.session.delete(booking)
         db.session.commit()
 
