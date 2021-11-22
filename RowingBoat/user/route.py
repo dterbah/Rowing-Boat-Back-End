@@ -228,3 +228,26 @@ class UserLogin(Resource):
             'is_admin': user.is_admin,
             'success': True
         }
+
+class BookingDelete(Resource):
+    @token_required
+    def delete(current_user, self, booking_id):
+        from datababe.models import Booking
+        from RowingBoat import db
+        
+        error_response = {
+            'success': False
+        }
+
+        booking = Booking.query.filter_by(booking_id=booking_id)
+        if booking == None:
+            error_response['message'] = f'No booking exists with booking ID : {booking_id}'
+            return error_response
+
+        db.session.delete(booking)
+        db.session.commit()
+
+        return {
+            'success': True,
+            'message': 'The booking was successfully deleted'
+        }

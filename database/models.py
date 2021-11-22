@@ -210,7 +210,9 @@ class Booking(db.Model):
             'booking_id': self.booking_id,
             'date': str(self.date),
             'type': self.boat.boat_type,
-            'class': self.boat.boat_class
+            'class': self.boat.boat_class,
+            'date': self.date.strftime('%d.%l.%Y, %H:%M'),
+            'name': self.boat.boat_class
         }
 
 class Notification(db.Model):
